@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoBairro Gestão - PWA Protótipo</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Estilos de acessibilidade e toque WCAG AA */
+        .min-touch {
+            min-width: 44px;
+            min-height: 44px;
+        }
+        /* Indicador de foco visível de alto contraste */
+        *:focus-visible {
+            outline: 3px solid #15803d !important;
+            outline-offset: 2px !important;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans text-slate-800 antialiased bg-slate-900">
+
+    <!-- Top Control Bar for Faculty Screenshots (Tela 1, Tela 2, Tela 3 view toggle) -->
+    <header class="bg-slate-950 text-white border-b border-slate-800 py-3 px-4 sticky top-0 z-50 shadow-md">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-2">
+                <span class="bg-emerald-500 text-slate-950 font-extrabold text-xs px-2 py-1 rounded">EAD TI</span>
+                <h1 class="text-sm font-semibold tracking-wide text-slate-200">Painel de Captura de Telas (Etapa 5)</h1>
+            </div>
+            
+            <!-- Screenshot Mode Selector Buttons -->
+            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 space-x-1" role="tablist" aria-label="Alternar visualização de telas para print">
+                <button onclick="switchScreen(1)" id="tab-btn-1" role="tab" aria-selected="true" class="min-touch px-3 py-1.5 text-xs font-bold rounded-md transition-all bg-emerald-600 text-white shadow-sm flex items-center gap-1.5">
+                    <i class="fa-solid fa-mobile-screen"></i> Tela 1 (Login)
+                </button>
+                <button onclick="switchScreen(2)" id="tab-btn-2" role="tab" aria-selected="false" class="min-touch px-3 py-1.5 text-xs font-bold rounded-md transition-all text-slate-300 hover:text-white hover:bg-slate-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-wheat-awn"></i> Tela 2 (Entrada)
+                </button>
+                <button onclick="switchScreen(3)" id="tab-btn-3" role="tab" aria-selected="false" class="min-touch px-3 py-1.5 text-xs font-bold rounded-md transition-all text-slate-300 hover:text-white hover:bg-slate-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-boxes-stacked"></i> Tela 3 (Alertas)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container simulating PWA Viewport -->
+    <main class="flex-1 flex justify-center items-center p-2 sm:p-6 bg-slate-900 overflow-y-auto">
+        
+        <!-- Mobile Frame Device Simulation -->
+        <div class="w-full max-w-[440px] min-h-[750px] bg-white rounded-3xl shadow-2xl border-4 border-slate-700 flex flex-col overflow-hidden relative">
+            
+            <!-- App Header / PWA Status Bar -->
+            <header class="bg-emerald-700 text-white p-4 shadow-md flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white/20 p-2 rounded-xl text-white text-lg">
+                        <i class="fa-solid fa-leaf"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-extrabold text-base leading-tight tracking-wide">EcoBairro Gestão</h2>
+                        <p class="text-[11px] text-emerald-100 font-medium">ODS 12 • Fome Zero e Inventário</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span id="pwa-status-badge" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-900 text-emerald-100 border border-emerald-500">
+                        <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Offline Ready
+                    </span>
+                </div>
+            </header>
+
+            <!-- Screen View 1: Tela 1 - Entrada Principal / Autenticação (Menu Inicial) -->
+            <section id="screen-1" class="flex-1 p-6 flex flex-col justify-between bg-slate-50">
+                <div class="space-y-6">
+                    <div class="text-center pt-2">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 text-emerald-700 rounded-2xl mb-3 shadow-inner">
+                            <i class="fa-solid fa-user-shield text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900">Acesso Restrito ao Galpão</h3>
+                        <p class="text-xs text-slate-600 mt-1">Identificação obrigatória para controle de inventário orgânico (OWASP A07)</p>
+                    </div>
+
+                    <!-- Notification Banner for Success/Demo -->
+                    <div id="login-alert" class="hidden p-3 bg-amber-50 border-l-4 border-amber-500 text-amber-900 text-xs rounded shadow-sm">
+                        <i class="fa-solid fa-circle-info mr-1"></i> Preencha os campos abaixo ou clique no botão de teste rápido.
+                    </div>
+
+                    <!-- Login Form -->
+                    <form onsubmit="handleLogin(event)" class="space-y-4">
+                        <div>
+                            <label for="email-input" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                                E-mail Institucional <span class="text-red-600">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-envelope text-sm"></i>
+                                </div>
+                                <input type="email" id="email-input" required value="helena.coordenadora@ecobairro.org" class="min-touch w-full pl-10 pr-3 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:border-emerald-600 transition-colors font-medium shadow-sm" placeholder="seu.email@ecobairro.org">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="password-input" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                                Palavra-passe de Acesso <span class="text-red-600">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-key text-sm"></i>
+                                </div>
+                                <input type="password" idpassword-input" required value="••••••••••••" class="min-touch w-full pl-10 pr-3 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:border-emerald-600 transition-colors font-medium shadow-sm">
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+                                <i class="fa-solid fa-lock text-emerald-700"></i> Hash seguro via Werkzeug (`pbkdf2:sha256`)
+                            </p>
+                        </div>
+
+                        <!-- Accessible Action Button (WCAG AA compliant: min 44px target height) -->
+                        <button type="submit" class="min-touch w-full bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-bold text-base py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 mt-2">
+                            <span>Entrar no Sistema</span>
+                            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                        </button>
+                    </form>
+
+                    <div class="relative flex py-1 items-center">
+                        <div class="flex-grow border-t border-slate-300"></div>
+                        <span class="flex-shrink mx-3 text-slate-400 text-xs font-semibold">OU</span>
+                        <div class="flex-grow border-t border-slate-300"></div>
+                    </div>
+
+                    <!-- Fast Guest Login Button for Professor Evaluation -->
+                    <button onclick="guestLogin()" class="min-touch w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs py-2.5 px-4 rounded-xl border border-slate-300 transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-user-check text-slate-600"></i> Entrar como Voluntário (Acesso Demo)
+                    </button>
+                </div>
+
+                <footer class="text-center pt-4 border-t border-slate-200 mt-4">
+                    <p class="text-[11px] text-slate-500 font-medium">Associação EcoBairro • Gestão de Hortifrútis</p>
+                    <p class="text-[10px] text-slate-400">Acessibilidade WCAG AA • Botões Mínimos de 44px</p>
+                </footer>
+            </section>
+
+            <!-- Screen View 2: Tela 2 - Execução da Funcionalidade Central (Registro de Entradas de Safras - RF01) -->
+            <section id="screen-2" class="hidden flex-1 p-5 flex flex-col justify-between bg-slate-50 overflow-y-auto">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+                        <div>
+                            <span class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Requisito RF01</span>
+                            <h3 class="text-base font-bold text-slate-900">Registrar Entrada de Safra</h3>
+                        </div>
+                        <span class="bg-emerald-600 text-white text-xs font-bold px-2 py-1 rounded-lg">Entrada</span>
+                    </div>
+
+                    <!-- Success Toast Message -->
+                    <div id="toast-success" class="hidden p-3 bg-emerald-700 text-white text-xs rounded-xl shadow-lg flex items-center justify-between animate-bounce">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check text-lg text-emerald-200"></i>
+                            <span>Safra registrada e saldo atualizado com sucesso!</span>
+                        </div>
+                        <button onclick="hideToast()" class="text-white hover:text-emerald-200 p-1"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+
+                    <!-- Central Registration Form -->
+                    <form id="safra-form" onsubmit="handleRegistrarSafra(event)" class="space-y-3.5">
+                        
+                        <!-- Product Selection -->
+                        <div>
+                            <label for="produto-select" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                                1. Selecionar Hortifrúti <span class="text-red-600">*</span>
+                            </label>
+                            <select id="produto-select" required class="min-touch w-full px-3 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:border-emerald-600 font-medium">
+                                <option value="">-- Selecione o item do catálogo --</option>
+                                <option value="Tomate Orgânico">Tomate Orgânico (Validade: 5 dias)</option>
+                                <option value="Alface Crespa">Alface Crespa (Validade: 2 dias)</option>
+                                <option value="Cenoura Orgânica">Cenoura Orgânica (Validade: 15 dias)</option>
+                                <option value="Mandioca Fresca">Mandioca Fresca (Validade: 7 dias)</option>
+                                <option value="Banana Prata">Banana Prata (Validade: 4 dias)</option>
+                            </select>
+                        </div>
+
+                        <!-- Producer Origin Dropdown -->
+                        <div>
+                            <label for="produtor-select" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                                2. Produtor Parceiro <span class="text-red-600">*</span>
+                            </label>
+                            <select id="produtor-select" required class="min-touch w-full px-3 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:border-emerald-600 font-medium">
+                                <option value="Sítio Boa Vista">Sítio Boa Vista (Produtor Local)</option>
+                                <option value="Horta Comunitária Sul">Horta Comunitária Sul</option>
+                                <option value="Cooperativa AgroEcológica">Cooperativa AgroEcológica</option>
+                            </select>
+                        </div>
+
+                        <!-- Quantity input (kg) with OWASP Validation -->
+                        <div>
+                            <label for="quantidade-input" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                                3. Quantidade em Quilogramas (Kg) <span class="text-red-600">*</span>
+                            </label>
+                            <div class="relative">
+                                <input type="number" id="quantidade-input" step="0.1" min="0.1" max="1000" required placeholder="Ex: 25.5" class="min-touch w-full pl-3 pr-12 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:border-emerald-600 font-bold">
+                                <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-500 font-bold text-xs">
+                                    KG
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-500 mt-1">Validação no cliente/servidor: Apenas números positivos > 0</p>
+                        </div>
+
+                        <!-- Harvest Date -->
+                        <div>
+                            <label for="data-input" class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
+                                4. Data de Recebimento no Galpão <span class="text-red-600">*</span>
+                            </label>
+                            <input type="date" id="data-input" required class="min-touch w-full px-3 py-2.5 text-sm bg-white border-2 border-slate-300 rounded-xl text-slate-900 focus:border-emerald-600 font-medium">
+                        </div>
+
+                        <!-- Submit Action Button -->
+                        <button type="submit" class="min-touch w-full bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-bold text-base py-3 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 mt-4">
+                            <i class="fa-solid fa-plus-circle text-lg"></i>
+                            <span>Confirmar e Salvar Safra</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="pt-3 border-t border-slate-200 mt-2">
+                    <button onclick="switchScreen(3)" class="min-touch w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-1">
+                        <span>Ver Saldo Atualizado na Tela 3</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Screen View 3: Tela 3 - Alertas, Listagem ou Resultados (Consulta de Saldo e Validade - RF02/RF03) -->
+            <section id="screen-3" class="hidden flex-1 p-4 flex flex-col justify-between bg-slate-50 overflow-y-auto">
+                <div class="space-y-3">
+                    
+                    <!-- Top Summary Card -->
+                    <div class="bg-slate-900 text-white p-3.5 rounded-2xl shadow-md flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Painel de Estoque (RF03)</span>
+                            <h3 class="text-sm font-bold text-white">Inventário em Tempo Real</h3>
+                        </div>
+                        <div class="text-right">
+                            <span id="total-kg-badge" class="text-lg font-black text-emerald-400">128.0</span>
+                            <span class="text-[10px] text-slate-300 block">Kg Totais</span>
+                        </div>
+                    </div>
+
+                    <!-- Perishability Criteria Notice (WCAG Accessible Labeling) -->
+                    <div class="bg-blue-50 border border-blue-200 p-2.5 rounded-xl text-[11px] text-blue-900 leading-snug">
+                        <i class="fa-solid fa-universal-access text-blue-700 mr-1"></i>
+                        <strong>Acessibilidade WCAG:</strong> Os alertas utilizam simultaneamente <strong>Texto, Ícones e Cores</strong> para pessoas com daltonismo.
+                    </div>
+
+                    <!-- Inventory Table List -->
+                    <div class="space-y-2" id="inventory-list-container">
+                        <!-- Items rendered via JavaScript -->
+                    </div>
+
+                </div>
+
+                <!-- Action Footer for Screen 3 -->
+                <div class="pt-3 border-t border-slate-200 mt-3 space-y-2">
+                    <button onclick="exportReport()" class="min-touch w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 shadow">
+                        <i class="fa-solid fa-file-export text-emerald-400"></i>
+                        <span>Exportar Relatório de Distribuição (RF04)</span>
+                    </button>
+                    
+                    <button onclick="switchScreen(2)" class="min-touch w-full bg-emerald-100 text-emerald-900 hover:bg-emerald-200 font-bold text-xs py-2 px-3 rounded-xl flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Cadastrar Nova Entrada (Tela 2)</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Device Bottom Navigation Bar -->
+            <nav class="bg-white border-t border-slate-200 px-4 py-2 flex items-center justify-around z-10">
+                <button onclick="switchScreen(1)" id="nav-btn-1" class="flex flex-col items-center text-emerald-700 min-touch justify-center">
+                    <i class="fa-solid fa-house text-lg"></i>
+                    <span class="text-[10px] font-bold mt-0.5">Início</span>
+                </button>
+                <button onclick="switchScreen(2)" id="nav-btn-2" class="flex flex-col items-center text-slate-400 hover:text-slate-700 min-touch justify-center">
+                    <i class="fa-solid fa-circle-plus text-lg"></i>
+                    <span class="text-[10px] font-bold mt-0.5">Entrada</span>
+                </button>
+                <button onclick="switchScreen(3)" id="nav-btn-3" class="flex flex-col items-center text-slate-400 hover:text-slate-700 min-touch justify-center">
+                    <i class="fa-solid fa-chart-pie text-lg"></i>
+                    <span class="text-[10px] font-bold mt-0.5">Estoque</span>
+                </button>
+            </nav>
+
+        </div>
+    </main>
+
+    <!-- Interactive JavaScript Engine -->
+    <script>
+        // Set default date picker to today
+        document.getElementById('data-input').valueAsDate = new Date();
+
+        // Sample initial Inventory Data
+        let inventoryData = [
+            { id: 1, produto: 'Alface Crespa', quantidade: 12.0, produtor: 'Horta Comunitária', diasValidade: 2, status: 'CRITICO', label: '🔴 [ALERTA CRÍTICO] Vence em 2 dias' },
+            { id: 2, produto: 'Tomate Orgânico', quantidade: 45.5, produtor: 'Sítio Boa Vista', diasValidade: 5, status: 'ATENCAO', label: '🟡 [ATENÇÃO] Vence em 5 dias' },
+            { id: 3, produto: 'Mandioca Fresca', quantidade: 38.0, produtor: 'Cooperativa Agro', diasValidade: 7, status: 'NORMAL', label: '🟢 [NORMAL] Vence em 7 dias' },
+            { id: 4, produto: 'Cenoura Orgânica', quantidade: 32.5, produtor: 'Sítio Boa Vista', diasValidade: 12, status: 'NORMAL', label: '🟢 [NORMAL] Vence em 12 dias' }
+        ];
+
+        // Screen Switching Function for Screenshots
+        function switchScreen(screenNum) {
+            // Hide all screen sections
+            document.getElementById('screen-1').classList.add('hidden');
+            document.getElementById('screen-2').classList.add('hidden');
+            document.getElementById('screen-3').classList.add('hidden');
+
+            // Show selected screen
+            document.getElementById(`screen-${screenNum}`).classList.remove('hidden');
+
+            // Update Top Header Tabs State
+            [1, 2, 3].forEach(n => {
+                const tabBtn = document.getElementById(`tab-btn-${n}`);
+                const navBtn = document.getElementById(`nav-btn-${n}`);
+                
+                if (n === screenNum) {
+                    tabBtn.className = "min-touch px-3 py-1.5 text-xs font-bold rounded-md transition-all bg-emerald-600 text-white shadow-sm flex items-center gap-1.5";
+                    tabBtn.setAttribute('aria-selected', 'true');
+                    navBtn.className = "flex flex-col items-center text-emerald-700 min-touch justify-center font-bold";
+                } else {
+                    tabBtn.className = "min-touch px-3 py-1.5 text-xs font-bold rounded-md transition-all text-slate-300 hover:text-white hover:bg-slate-700 flex items-center gap-1.5";
+                    tabBtn.setAttribute('aria-selected', 'false');
+                    navBtn.className = "flex flex-col items-center text-slate-400 hover:text-slate-700 min-touch justify-center";
+                }
+            });
+
+            if (screenNum === 3) {
+                renderInventory();
+            }
+        }
+
+        // Login Handler (Tela 1)
+        function handleLogin(e) {
+            e.preventDefault();
+            switchScreen(2);
+        }
+
+        function guestLogin() {
+            switchScreen(2);
+        }
+
+        // Add New Harvest Entry Handler (Tela 2)
+        function handleRegistrarSafra(e) {
+            e.preventDefault();
+            
+            const produto = document.getElementById('produto-select').value;
+            const produtor = document.getElementById('produtor-select').value;
+            const quantidade = parseFloat(document.getElementById('quantidade-input').value);
+            
+            if (!produto || !quantidade || quantidade <= 0) {
+                alert("Por favor, preencha a quantidade válida maior que zero.");
+                return;
+            }
+
+            // Estimate validity shelf life based on item
+            let diasVal = 5;
+            let statusVal = 'ATENCAO';
+            let labelText = '🟡 [ATENÇÃO] Vence em 5 dias';
+
+            if (produto.includes('Alface')) {
+                diasVal = 2; statusVal = 'CRITICO'; labelText = '🔴 [ALERTA CRÍTICO] Vence em 2 dias';
+            } else if (produto.includes('Cenoura')) {
+                diasVal = 14; statusVal = 'NORMAL'; labelText = '🟢 [NORMAL] Vence em 14 dias';
+            }
+
+            // Push to state array
+            inventoryData.unshift({
+                id: Date.now(),
+                produto: produto,
+                quantidade: quantidade,
+                produtor: produtor,
+                diasValidade: diasVal,
+                status: statusVal,
+                label: labelText
+            });
+
+            // Show Toast Notification
+            const toast = document.getElementById('toast-success');
+            toast.classList.remove('hidden');
+
+            // Reset form
+            document.getElementById('quantidade-input').value = '';
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        function hideToast() {
+            document.getElementById('toast-success').classList.add('hidden');
+        }
+
+        // Render Inventory List (Tela 3)
+        function renderInventory() {
+            const container = document.getElementById('inventory-list-container');
+            container.innerHTML = '';
+
+            let totalKg = 0;
+
+            inventoryData.forEach(item => {
+                totalKg += item.quantidade;
+
+                let borderClass = "border-emerald-500 bg-emerald-50 text-emerald-950";
+                let badgeClass = "bg-emerald-700 text-white";
+                let icon = "fa-circle-check";
+
+                if (item.status === 'CRITICO') {
+                    borderClass = "border-red-500 bg-red-50 text-red-950";
+                    badgeClass = "bg-red-700 text-white animate-pulse";
+                    icon = "fa-triangle-exclamation";
+                } else if (item.status === 'ATENCAO') {
+                    borderClass = "border-amber-500 bg-amber-50 text-amber-950";
+                    badgeClass = "bg-amber-600 text-white";
+                    icon = "fa-circle-exclamation";
+                }
+
+                const cardHTML = `
+                    <div class="p-3 rounded-xl border-l-4 ${borderClass} bg-white shadow-sm flex items-center justify-between">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h4 class="font-bold text-sm text-slate-900">${item.produto}</h4>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${badgeClass} flex items-center gap-1">
+                                    <i class="fa-solid ${icon}"></i> ${item.label}
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-1">Origem: <strong>${item.produtor}</strong></p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-base font-black text-slate-900">${item.quantidade.toFixed(1)}</span>
+                            <span class="text-xs font-bold text-slate-600"> Kg</span>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+
+            document.getElementById('total-kg-badge').innerText = totalKg.toFixed(1);
+        }
+
+        function exportReport() {
+            alert("Relatório de inventário exportado com sucesso! Ficheiro gerado com conformidade ODS 12.");
+        }
+
+        // Render initial screen 1 view
+        switchScreen(1);
+    </script>
+</body>
+</html>
