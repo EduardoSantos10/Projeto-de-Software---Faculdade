@@ -1,0 +1,30 @@
+# Garantir a diretoria dos workflows e sobrescrever o pipeline com as ações v4/v5
+name: Continuous Integration - EcoBairro Gestão
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Instalar Dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Executar Testes Automatizados com Cobertura
+        run: |
+          PYTHONPATH=. pytest --cov=app tests/
